@@ -1,239 +1,279 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center">
+
     <TextView
-        android:layout_marginTop="70dp"
+        android:layout_marginTop="20dp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         android:layout_centerHorizontal="true"
         android:textColor="@color/black"
         android:text="Simulator is off."
-        android:id="@+id/textview_simulator"/>
+        android:id="@+id/textview_simulator"
+        />
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:id="@+id/ScrollView">
+
+        <LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+
+
+
+        <TableLayout
+            android:id="@+id/group2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/group1"
+            android:orientation="horizontal">
+
+            <TableRow
+                android:gravity="center_horizontal">
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+
+                    android:gravity="center"
+                    android:text="Flight Bearing (°):" />
+
+                <EditText
+                    android:id="@+id/Bearing_val"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="0"
+                    android:layout_marginRight="10dp"
+                    android:inputType="numberDecimal|numberSigned"/>
+
+                <TextView
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="10dp"
+                    android:gravity="center"
+                    android:text="Thrust (%):" />
+
+                <EditText
+                    android:id="@+id/FlightThrust_val"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="0"
+                    android:layout_marginRight="10dp"
+                    android:inputType="numberDecimal|numberSigned"/>
+                <Spinner
+                    android:id="@+id/FlightUnit_spinner"
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:spinnerMode="dropdown"/>
+
+                <EditText
+                    android:id="@+id/FlightUnit_val"
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="0"
+                    android:layout_marginRight="10dp"
+                    android:inputType="numberDecimal|numberSigned"/>
+                <Button
+                    android:id="@+id/btn_start_Flight"
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:text="Start Flight"
+                    style="@style/common_button"/>
+            </TableRow>
+
+            <TableRow
+                android:gravity="center_horizontal">
+                <TextView
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="10dp"
+                    android:gravity="center"
+                    android:text="Yaw Thrust (%):" />
+
+                <EditText
+                    android:id="@+id/YawThrust_val"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="0"
+                    android:layout_marginRight="10dp"
+                    android:inputType="numberDecimal|numberSigned"/>
+                <Spinner
+                    android:id="@+id/YawUnit_spinner"
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:spinnerMode="dropdown"/>
+
+                <EditText
+                    android:id="@+id/YawUnit_val"
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="0"
+                    android:layout_marginRight="10dp"
+                    android:inputType="numberDecimal|numberSigned"/>
+                <Button
+                    android:id="@+id/btn_start_Yaw"
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:text="Start Yaw"
+                    style="@style/common_button"/>
+            </TableRow>
+            <TableRow
+                android:gravity="center_horizontal">
+                <TextView
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="10dp"
+                    android:gravity="center"
+                    android:text="Climb Thrust (%):" />
+
+                <EditText
+                    android:id="@+id/ClimbThrust_val"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="0"
+                    android:layout_marginRight="10dp"
+                    android:inputType="numberDecimal|numberSigned"/>
+                <Spinner
+                    android:id="@+id/ClimbUnit_spinner"
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:spinnerMode="dropdown"/>
+
+                <EditText
+                    android:id="@+id/ClimbUnit_val"
+                    android:layout_width="50dp"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="0"
+                    android:layout_marginRight="10dp"
+                    android:inputType="numberDecimal|numberSigned"/>
+                <Button
+                    android:id="@+id/btn_start_Climb"
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:text="Start Climb"
+                    style="@style/common_button"/>
+            </TableRow>
+
+        </TableLayout>
+        </LinearLayout>
+    </ScrollView>
 
     <LinearLayout
-        android:id="@+id/group1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_below="@+id/textview_simulator"
-        android:orientation="horizontal">
-        <ToggleButton
-            android:id="@+id/btn_start_simulator"
-            android:layout_width="70dp"
-            android:layout_height="wrap_content"
-            android:text="Start Simulator"
-            android:textOff="Start Simulator"
-            android:textOn="Stop Simulator"
-            android:layout_marginBottom="10dp"
-            style="@style/common_button"
-            android:layout_marginRight="10dp"/>
-        <Button
-            android:id="@+id/btn_force_land"
-            android:layout_width="70dp"
-            android:layout_height="wrap_content"
-            android:text="Confirm Land"
-            android:layout_marginRight="10dp"
-            android:layout_marginBottom="10dp"
-            style="@style/common_button"/>
-        <Button
-            android:id="@+id/btn_take_off"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content"
-            android:text="Take Off"
-            android:layout_marginBottom="10dp"
-            android:layout_marginRight="10dp"
-            style="@style/common_button"/>
-        <Button
-            android:id="@+id/btn_auto_land"
-            android:layout_width="70dp"
-            android:layout_height="wrap_content"
-            android:text="Auto Land"
-            android:layout_marginBottom="10dp"
-            android:layout_marginRight="10dp"
-            style="@style/common_button"/>
-        <Button
-            android:id="@+id/btn_stop_inst"
-            android:layout_width="70dp"
-            android:layout_height="wrap_content"
-            android:text="Stop Inst"
-            android:layout_marginBottom="10dp"
-            style="@style/common_button"/>
-
-    </LinearLayout>
-
-
-    <TableLayout
-        android:id="@+id/group2"
+        android:gravity="center_horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/group1"
-        android:orientation="horizontal">
-
-        <TableRow
-            android:gravity="center_horizontal">
-            <TextView
-                android:layout_width="100dp"
-                android:layout_height="match_parent"
-
-                android:gravity="center"
-                android:text="Flight Bearing (°):" />
-
-            <EditText
-                android:id="@+id/Bearing_val"
-                android:layout_width="40dp"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="0"
-                android:layout_marginRight="10dp"
-                android:inputType="numberDecimal|numberSigned"/>
-
-            <TextView
-                android:layout_width="50dp"
-                android:layout_height="match_parent"
-                android:layout_marginRight="10dp"
-                android:gravity="center"
-                android:text="Thrust (%):" />
-
-            <EditText
-                android:id="@+id/FlightThrust_val"
-                android:layout_width="40dp"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="0"
-                android:layout_marginRight="10dp"
-                android:inputType="numberDecimal|numberSigned"/>
-            <Spinner
-                android:id="@+id/FlightUnit_spinner"
-                android:layout_width="100dp"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:spinnerMode="dropdown"/>
-
-            <EditText
-                android:id="@+id/FlightUnit_val"
-                android:layout_width="50dp"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="0"
-                android:layout_marginRight="10dp"
-                android:inputType="numberDecimal|numberSigned"/>
-            <Button
-                android:id="@+id/btn_start_Flight"
-                android:layout_width="100dp"
-                android:layout_height="match_parent"
-                android:text="Start Flight"
-                style="@style/common_button"/>
-        </TableRow>
-
-        <TableRow
-            android:gravity="center_horizontal">
-            <TextView
-                android:layout_width="50dp"
-                android:layout_height="match_parent"
-                android:layout_marginRight="10dp"
-                android:gravity="center"
-                android:text="Yaw Thrust (%):" />
-
-            <EditText
-                android:id="@+id/YawThrust_val"
-                android:layout_width="40dp"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="0"
-                android:layout_marginRight="10dp"
-                android:inputType="numberDecimal|numberSigned"/>
-            <Spinner
-                android:id="@+id/YawUnit_spinner"
-                android:layout_width="100dp"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:spinnerMode="dropdown"/>
-
-            <EditText
-                android:id="@+id/YawUnit_val"
-                android:layout_width="50dp"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="0"
-                android:layout_marginRight="10dp"
-                android:inputType="numberDecimal|numberSigned"/>
-            <Button
-                android:id="@+id/btn_start_Yaw"
-                android:layout_width="100dp"
-                android:layout_height="match_parent"
-                android:text="Start Yaw"
-                style="@style/common_button"/>
-        </TableRow>
-        <TableRow
-            android:gravity="center_horizontal">
-            <TextView
-                android:layout_width="50dp"
-                android:layout_height="match_parent"
-                android:layout_marginRight="10dp"
-                android:gravity="center"
-                android:text="Climb Thrust (%):" />
-
-            <EditText
-                android:id="@+id/ClimbThrust_val"
-                android:layout_width="40dp"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="0"
-                android:layout_marginRight="10dp"
-                android:inputType="numberDecimal|numberSigned"/>
-            <Spinner
-                android:id="@+id/ClimbUnit_spinner"
-                android:layout_width="100dp"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:spinnerMode="dropdown"/>
-
-            <EditText
-                android:id="@+id/ClimbUnit_val"
-                android:layout_width="50dp"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="0"
-                android:layout_marginRight="10dp"
-                android:inputType="numberDecimal|numberSigned"/>
-            <Button
-                android:id="@+id/btn_start_Climb"
-                android:layout_width="100dp"
-                android:layout_height="match_parent"
-                android:text="Start Climb"
-                style="@style/common_button"/>
-        </TableRow>
-
-    </TableLayout>
+        android:orientation="horizontal"
+        >
+    <com.dji.sdk.sample.internal.utils.OnScreenJoystick
+        android:id="@+id/directionJoystickLeft"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="10dp"
+        android:background="@mipmap/joystick_bg"/>
+        <ScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        <LinearLayout
+            android:id="@+id/group1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_below="@+id/textview_simulator"
+            android:orientation="vertical">
 
 
-    <!-- <LinearLayout
-         android:id="@+id/groupJoystick"
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:layout_below="@+id/group1"
-         android:orientation="horizontal">
-         <com.dji.sdk.sample.internal.utils.OnScreenJoystick
-             android:id="@+id/directionJoystickLeft"
-             android:layout_width="130dp"
-             android:layout_height="130dp"
-             android:layout_alignParentLeft="true"
-             android:layout_alignParentBottom="true"
-             android:layout_marginBottom="10dp"
-             android:layout_marginLeft="10dp"
-             android:background="@mipmap/joystick_bg"/>
+                <LinearLayout
+                    android:id="@+id/group1_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_below="@+id/textview_simulator"
+                    android:orientation="horizontal">
+                <ToggleButton
+                    android:id="@+id/btn_start_simulator"
+                    android:layout_width="70dp"
+                    android:layout_height="wrap_content"
+                    android:text="Start Simu"
+                    android:textOff="Start Simu"
+                    android:textOn="Stop Simu"
+                    android:layout_marginBottom="10dp"
+                    style="@style/common_button"
+                    android:layout_marginRight="10dp"/>
+                <Button
+                    android:id="@+id/btn_force_land"
+                    android:layout_width="70dp"
+                    android:layout_height="wrap_content"
+                    android:text="Confirm Land"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginBottom="10dp"
+                    style="@style/common_button"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/group1_2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:layout_below="@+id/textview_simulator"
+                        android:orientation="horizontal">
+                    <Button
+                        android:id="@+id/btn_take_off"
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        android:text="Take Off"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginRight="10dp"
+                        style="@style/common_button"/>
+                    <Button
+                        android:id="@+id/btn_auto_land"
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        android:text="Auto Land"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginRight="10dp"
+                        style="@style/common_button"/>
+                    <Button
+                        android:id="@+id/btn_stop_inst"
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        android:text="Stop Inst"
+                        android:layout_marginBottom="10dp"
+                        style="@style/common_button"/>
+                    </LinearLayout>
+            </LinearLayout>
+            </ScrollView>
 
-         <com.dji.sdk.sample.internal.utils.OnScreenJoystick
-             android:id="@+id/directionJoystickRight"
-             android:layout_width="130dp"
-             android:layout_height="130dp"
-             android:layout_alignParentRight="true"
-             android:layout_alignParentBottom="true"
-             android:layout_marginBottom="10dp"
-             android:layout_marginRight="10dp"
-             android:background="@mipmap/joystick_bg"/>
-     </LinearLayout>-->
+    <com.dji.sdk.sample.internal.utils.OnScreenJoystick
+        android:id="@+id/directionJoystickRight"
+        android:layout_width="130dp"
+        android:layout_height="130dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@mipmap/joystick_bg"/>
+    </LinearLayout>
 
-</merge>
+</LinearLayout >
