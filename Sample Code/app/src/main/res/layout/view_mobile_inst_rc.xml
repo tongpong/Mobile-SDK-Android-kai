@@ -4,16 +4,34 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center">
-
-    <TextView
-        android:layout_marginTop="20dp"
-        android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/status_solid"
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:background="#FFFF00"
+            />
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_centerHorizontal="true"
-        android:textColor="@color/black"
-        android:text="Simulator is off."
-        android:id="@+id/textview_simulator"
-        />
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+        <TextView
+            android:id="@+id/textview_simulator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="Simulator is off."
+            android:textColor="@color/black"
+            android:gravity="center_vertical"/>
+        <TextView
+            android:id="@+id/flight_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="flight_data"
+            android:textColor="@color/black"
+            android:gravity="center_vertical"/>
+    </LinearLayout>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -66,7 +84,7 @@
                     android:layout_width="40dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="0"
+                    android:text="30"
                     android:layout_marginRight="10dp"
                     android:inputType="numberDecimal|numberSigned"/>
                 <Spinner
@@ -106,7 +124,7 @@
                     android:layout_width="40dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="0"
+                    android:text="50"
                     android:layout_marginRight="10dp"
                     android:inputType="numberDecimal|numberSigned"/>
                 <Spinner
@@ -145,7 +163,7 @@
                     android:layout_width="40dp"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="0"
+                    android:text="50"
                     android:layout_marginRight="10dp"
                     android:inputType="numberDecimal|numberSigned"/>
                 <Spinner
@@ -212,26 +230,40 @@
                     android:gravity="center"
                     android:layout_below="@+id/textview_simulator"
                     android:orientation="horizontal">
-                <ToggleButton
-                    android:id="@+id/btn_start_simulator"
-                    android:layout_width="70dp"
-                    android:layout_height="wrap_content"
-                    android:text="Start Simu"
-                    android:textOff="Start Simu"
-                    android:textOn="Stop Simu"
-                    android:layout_marginBottom="10dp"
-                    style="@style/common_button"
-                    android:layout_marginRight="10dp"/>
-                <Button
-                    android:id="@+id/btn_force_land"
-                    android:layout_width="70dp"
-                    android:layout_height="wrap_content"
-                    android:text="Confirm Land"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginBottom="10dp"
-                    style="@style/common_button"/>
-                    </LinearLayout>
-                    <LinearLayout
+                    <ToggleButton
+                        android:id="@+id/btn_start_simulator"
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        android:text="Start Simu"
+                        android:textOff="Start Simu"
+                        android:textOn="Stop Simu"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginBottom="10dp"
+                        style="@style/common_button"
+                        android:textSize = "10sp"
+                        android:layout_marginRight="10dp"/>
+                    <Button
+                        android:id="@+id/btn_force_land"
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        android:text="Confirm Land"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:textSize = "10sp"
+                        style="@style/common_button"/>
+                    <ToggleButton
+                        android:id="@+id/btn_man_flight"
+                        android:layout_width="70dp"
+                        android:layout_height="wrap_content"
+                        android:text="Man Ctrl"
+                        android:textOff="Man Ctrl"
+                        android:textOn="Inst Ctrl"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:textSize = "10sp"
+                        style="@style/common_button"/>
+                </LinearLayout>
+                <LinearLayout
                         android:id="@+id/group1_2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -245,6 +277,7 @@
                         android:text="Take Off"
                         android:layout_marginBottom="10dp"
                         android:layout_marginRight="10dp"
+                        android:textSize = "10sp"
                         style="@style/common_button"/>
                     <Button
                         android:id="@+id/btn_auto_land"
@@ -253,12 +286,14 @@
                         android:text="Auto Land"
                         android:layout_marginBottom="10dp"
                         android:layout_marginRight="10dp"
+                        android:textSize = "10sp"
                         style="@style/common_button"/>
                     <Button
                         android:id="@+id/btn_stop_inst"
                         android:layout_width="70dp"
                         android:layout_height="wrap_content"
                         android:text="Stop Inst"
+                        android:textSize = "10sp"
                         android:layout_marginBottom="10dp"
                         style="@style/common_button"/>
                     </LinearLayout>

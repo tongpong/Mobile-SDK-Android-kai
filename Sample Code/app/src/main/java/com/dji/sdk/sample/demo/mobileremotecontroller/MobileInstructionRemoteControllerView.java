@@ -2,6 +2,8 @@ package com.dji.sdk.sample.demo.mobileremotecontroller;
 
 import android.app.Service;
 import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.shapes.Shape;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,7 +15,9 @@ import android.widget.ToggleButton;
 import android.widget.Spinner;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-
+import android.graphics.drawable.Drawable;
+import android.os.Handler;
+import android.os.Message;
 import com.dji.sdk.sample.R;
 import com.dji.sdk.sample.internal.OnScreenJoystickListener;
 import com.dji.sdk.sample.internal.controller.DJISampleApplication;
@@ -23,7 +27,11 @@ import com.dji.sdk.sample.internal.utils.OnScreenJoystick;
 import com.dji.sdk.sample.internal.utils.ToastUtils;
 import com.dji.sdk.sample.internal.view.PresentableView;
 
+//import java.util.logging.Handler;
+import java.util.logging.LogRecord;
+
 import dji.common.error.DJIError;
+import dji.common.flightcontroller.FlightControllerState;
 import dji.common.flightcontroller.simulator.InitializationData;
 import dji.common.flightcontroller.simulator.SimulatorState;
 import dji.common.model.LocationCoordinate2D;
@@ -41,12 +49,14 @@ import dji.sdk.products.Aircraft;
 public class MobileInstructionRemoteControllerView extends RelativeLayout
         implements View.OnClickListener, CompoundButton.OnCheckedChangeListener, PresentableView {
 
+    private Button status_solid ;
     private ToggleButton btnSimulator;
     private Button btnTakeOff;
     private Button autoLand;
     private Button forceLand;
 
     private TextView textView;
+    private TextView flight_data;
 
     private EditText Bearing_val_text;
     private EditText FlightThrust_val_text;
@@ -59,8 +69,8 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
     private Button btn_start_Flight;
     private Button btn_start_Yaw;
     private Button btn_start_Climb;
-    private  Button btn_stop_inst;
-
+    private Button btn_stop_inst;
+    private ToggleButton btn_man_flight;
     //------------------------------Flight Permanent----------------------------------------------//
     private boolean Flight_starting;
     private double Bearing_val;
@@ -69,21 +79,31 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
     private double Rightjoystick_X;
     private double Rightjoystick_Y;
     private long Flight_timestamp;
+    private long FlightUnit_remain;
     //------------------------------Yaw Permanent----------------------------------------------//
     private boolean Yaw_starting;
     private double YawThrust_val;
     private double YawUnit_val;
     private double Leftjoystick_X;
     private long Yaw_timestamp;
+    private long YawUnit_remain;
     //------------------------------Climb Permanent----------------------------------------------//
     private boolean Climb_starting;
     private double ClimbThrust_val;
     private double ClimbUnit_val;
     private double Leftjoystick_Y;
     private long Climb_timestamp;
-
-
-
+    private long ClimbUnit_remain;
+    //------------------------------flight data--------------------------------------------------
+    private float VelocityX;
+    private float VelocityY;
+    private float VelocityZ;
+    //-----------------------------Thread------------------------------------------------------..
+    private  Thread FlightProcessThread;
+    private int colortmp;
+    private boolean AutoFlight;
+    private boolean ManFlight ;
+    //private static double thrust_limit=0.5;
 
     //Spinner FlightUnit_spinner = (Spinner)findViewById(R.id.FlightUnit_spinner);
     //Spinner YawUnit_spinner = (Spinner)findViewById(R.id.YawUnit_spinner);
@@ -94,6 +114,8 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
     private MobileRemoteController mobileRemoteController;
     private FlightControllerKey isSimulatorActived;
 
+    private  FlightController flightController;
+    private FlightControllerState mFlightControllerState;
     public MobileInstructionRemoteControllerView(Context context) {
         super(context);
         init(context);
@@ -130,14 +152,21 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
     }
 
     private void initUI() {
+       status_solid =(Button) findViewById(R.id.status_solid);
+       status_solid.setBackgroundColor(0xB2FF0000);
         btnTakeOff = (Button) findViewById(R.id.btn_take_off);
         autoLand = (Button) findViewById(R.id.btn_auto_land);
         autoLand.setOnClickListener(this);
         forceLand = (Button) findViewById(R.id.btn_force_land);
         forceLand.setOnClickListener(this);
         btnSimulator = (ToggleButton) findViewById(R.id.btn_start_simulator);
-
+        btnSimulator.setOnCheckedChangeListener(MobileInstructionRemoteControllerView.this);
         textView = (TextView) findViewById(R.id.textview_simulator);
+        flight_data = (TextView) findViewById(R.id.flight_data);
+
+        btn_man_flight = (ToggleButton) findViewById(R.id.btn_man_flight);
+        btn_man_flight.setOnCheckedChangeListener(MobileInstructionRemoteControllerView.this);
+
         btn_start_Flight = (Button) findViewById(R.id.btn_start_Flight);
         btn_start_Flight.setOnClickListener(this);
         btn_start_Yaw = (Button) findViewById(R.id.btn_start_Yaw);
@@ -171,91 +200,17 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
         screenJoystickLeft = (OnScreenJoystick) findViewById(R.id.directionJoystickLeft);
 
         btnTakeOff.setOnClickListener(this);
-        btnSimulator.setOnCheckedChangeListener(MobileInstructionRemoteControllerView.this);
-
+        ManFlight =false;
+        AutoFlight=false;
         Boolean isSimulatorOn = (Boolean) KeyManager.getInstance().getValue(isSimulatorActived);
         if (isSimulatorOn != null && isSimulatorOn) {
             btnSimulator.setChecked(true);
             textView.setText("Simulator is On.");
         }
     }
-    private void setLeftStick(float pX, float pY){
-        if (Math.abs(pX) < 0.02) {
-            pX = 0;
-        }
 
-        if (Math.abs(pY) < 0.02) {
-            pY = 0;
-        }
-        if (mobileRemoteController != null) {
-            mobileRemoteController.setLeftStickHorizontal(pX);
-            mobileRemoteController.setLeftStickVertical(pY);
-        }
-    }
-    private void setRightStick(float pX, float pY){
-        if (Math.abs(pX) < 0.02) {
-            pX = 0;
-        }
 
-        if (Math.abs(pY) < 0.02) {
-            pY = 0;
-        }
-        if (mobileRemoteController != null) {
-            mobileRemoteController.setRightStickHorizontal(pX);
-            mobileRemoteController.setRightStickVertical(pY);
-        }
-    }
-    private void Flight_instruction() {
-        if(Flight_starting) {
-            FlightUnit_val -= (System.currentTimeMillis() - Flight_timestamp)/1000;
-            if (FlightUnit_val<=0.0f) {
-                Rightjoystick_X = 0.0;
-                Rightjoystick_Y = 0.0;
-                Flight_starting = false;
-                FlightUnit_val=0;
-                FlightUnit_val_text.setFocusable(true);
-            }
 
-            FlightUnit_val_text.setText(Float.toString((float)FlightUnit_val));
-        }
-        setRightStick((float) Rightjoystick_X, (float) Rightjoystick_Y);
-    }
-    private void Yaw_instruction(){
-        if(Yaw_starting){
-            YawUnit_val-=(System.currentTimeMillis()-Yaw_timestamp)/1000;
-            if(YawUnit_val<=0.0f){
-                YawUnit_val=0;
-                Leftjoystick_X=0.0;
-                Yaw_starting=false;
-                YawUnit_val_text.setFocusable(true);
-            }
-            YawUnit_val_text.setText(Float.toString((float)YawUnit_val));
-        }
-    }
-    private void Climb_instruction(){
-        if(Climb_starting) {
-             ClimbUnit_val -= (System.currentTimeMillis() - Climb_timestamp)/1000;
-
-            if ( ClimbUnit_val<= 0.0f) {
-                ClimbUnit_val=0;
-                Leftjoystick_Y = 0.0f;
-                Climb_starting = false;
-                ClimbUnit_val_text.setFocusable(true);
-            }
-            ClimbUnit_val_text.setText(Float.toString((float)ClimbUnit_val));
-        }
-    }
-    private  void ClimbNYaw_insturction(){
-        if(Yaw_starting||Climb_starting){
-            Yaw_instruction();
-            Climb_instruction();
-        }
-        setLeftStick((float)Leftjoystick_X,(float)Leftjoystick_Y);
-    }
-
-    public  void onUpdate(){
-
-    }
     private void setUpListeners() {
         Simulator simulator = ModuleVerificationUtil.getSimulator();
         if (simulator != null) {
@@ -295,23 +250,9 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
 
             @Override
             public void onTouch(OnScreenJoystick joystick, float pX, float pY) {
-                /*if (Math.abs(pX) < 0.02) {
-                    pX = 0;
+                if(ManFlight) {
+                    setLeftStick(pX,pY);
                 }
-
-                if (Math.abs(pY) < 0.02) {
-                    pY = 0;
-                }
-
-
-                if (mobileRemoteController != null) {
-                    mobileRemoteController.setLeftStickHorizontal(pX);
-                    mobileRemoteController.setLeftStickVertical(pY);
-                }*/
-                textView.setText("FlightUnit_val : "+Float.toString((float)FlightUnit_val)
-                        +"YawUnit_val : "+Float.toString((float)YawUnit_val)
-                        +"ClimbUnit_val : "+ Float.toString((float)ClimbUnit_val));
-                ClimbNYaw_insturction();
             }
         });
 
@@ -319,22 +260,9 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
 
             @Override
             public void onTouch(OnScreenJoystick joystick, float pX, float pY) {
-                /*if (Math.abs(pX) < 0.02) {
-                    pX = 0;
+                if(ManFlight) {
+                    setRightStick(pX,pY);
                 }
-
-                if (Math.abs(pY) < 0.02) {
-                    pY = 0;
-                }
-                if (mobileRemoteController != null) {
-                    mobileRemoteController.setRightStickHorizontal(pX);
-                    mobileRemoteController.setRightStickVertical(pY);
-                }*/
-                textView.setText("FlightUnit_val : "+Float.toString((float)FlightUnit_val)
-                        +"YawUnit_val : "+Float.toString((float)YawUnit_val)
-                        +"ClimbUnit_val : "+ Float.toString((float)ClimbUnit_val));
-
-                Flight_instruction();
             }
         });
     }
@@ -349,23 +277,21 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
     }
     private void set_Flight_perm(){
 
-        textView.setText("start2");
         Bearing_val = Float.parseFloat(Bearing_val_text.getText().toString());
-        textView.setText("start3");
         FlightThrust_val = Float.parseFloat(FlightThrust_val_text.getText().toString())/100.0;
-        textView.setText(textView.getText()+"\n"+Float.toString((float) FlightThrust_val));
+        if(FlightThrust_val>1.0) FlightThrust_val=1.0;
+        if(FlightThrust_val<-1.0) FlightThrust_val=-1.0;
         Rightjoystick_X= FlightThrust_val*Math.cos(Math.toRadians(Bearing_val));
-        textView.setText(textView.getText()+"\n"+Float.toString((float)Rightjoystick_X));
         Rightjoystick_Y = FlightThrust_val*Math.sin(Math.toRadians(Bearing_val));
-        textView.setText(textView.getText()+"\n"+Float.toString((float)Rightjoystick_Y));
         FlightUnit_val = Float.parseFloat(FlightUnit_val_text.getText().toString());
-        textView.setText(textView.getText()+"\n"+Float.toString((float)FlightUnit_val));
         Flight_timestamp=System.currentTimeMillis();
         //FlightUnit_val_text.setFocusable(false);
         Flight_starting=true;
     }
     private void set_Yaw_perm(){
         YawThrust_val =  Float.parseFloat(YawThrust_val_text.getText().toString())/100.0;
+        if(YawThrust_val>1.0) YawThrust_val=1.0;
+        if(YawThrust_val<-1.0) YawThrust_val=-1.0;
         YawUnit_val =  Float.parseFloat(YawUnit_val_text.getText().toString());
         Leftjoystick_X = YawThrust_val;
 
@@ -375,6 +301,8 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
     }
     private void set_Climb_perm(){
         ClimbThrust_val =  Float.parseFloat(ClimbThrust_val_text.getText().toString())/100.0;
+        if(ClimbThrust_val>1.0) ClimbThrust_val=1.0;
+        if(ClimbThrust_val<-1.0) ClimbThrust_val=-1.0;
         ClimbUnit_val =  Float.parseFloat(ClimbUnit_val_text.getText().toString());
         Leftjoystick_Y = ClimbThrust_val;
 
@@ -394,11 +322,153 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
         //YawUnit_val_text.setFocusable(true);
         //ClimbUnit_val_text.setFocusable(true);
     }
+    private void setLeftStick(float pX, float pY){
+        if (Math.abs(pX) < 0.02) {
+            pX = 0;
+        }
+
+        if (Math.abs(pY) < 0.02) {
+            pY = 0;
+        }
+        if (mobileRemoteController != null) {
+            mobileRemoteController.setLeftStickHorizontal(pX);
+            mobileRemoteController.setLeftStickVertical(pY);
+        }
+    }
+    private void setRightStick(float pX, float pY){
+        if (Math.abs(pX) < 0.02) {
+            pX = 0;
+        }
+
+        if (Math.abs(pY) < 0.02) {
+            pY = 0;
+        }
+        if (mobileRemoteController != null) {
+            mobileRemoteController.setRightStickHorizontal(pX);
+            mobileRemoteController.setRightStickVertical(pY);
+        }
+    }
+    private void Flight_instruction() {
+        if(Flight_starting) {
+            FlightUnit_val -= (System.currentTimeMillis() - Flight_timestamp);
+            Flight_timestamp = System.currentTimeMillis();
+            if (FlightUnit_val<=0.0f) {
+                Rightjoystick_X = 0.0;
+                Rightjoystick_Y = 0.0;
+                Flight_starting = false;
+                FlightUnit_val=0;
+                FlightUnit_val_text.setFocusable(true);
+            }
+
+            //FlightUnit_val_text.setText(Float.toString((float)FlightUnit_val));
+            setRightStick((float) Rightjoystick_X, (float) Rightjoystick_Y);
+        }
+    }
+    private void Yaw_instruction(){
+        if(Yaw_starting){
+            YawUnit_val-=(System.currentTimeMillis()-Yaw_timestamp);
+            Yaw_timestamp = System.currentTimeMillis();
+            if(YawUnit_val<=0.0f){
+                YawUnit_val=0;
+                Leftjoystick_X=0.0;
+                Yaw_starting=false;
+                YawUnit_val_text.setFocusable(true);
+            }
+            //YawUnit_val_text.setText(Float.toString((float)YawUnit_val));
+        }
+    }
+    private void Climb_instruction(){
+        if(Climb_starting) {
+            ClimbUnit_val -= (System.currentTimeMillis() - Climb_timestamp);
+            Climb_timestamp=System.currentTimeMillis();
+            if ( ClimbUnit_val<= 0.0f) {
+                ClimbUnit_val=0;
+                Leftjoystick_Y = 0.0f;
+                Climb_starting = false;
+                ClimbUnit_val_text.setFocusable(true);
+            }
+            //ClimbUnit_val_text.setText(Float.toString((float)ClimbUnit_val));
+        }
+    }
+    private  void ClimbNYaw_insturction(){
+        if(Yaw_starting||Climb_starting){
+            Yaw_instruction();
+            Climb_instruction();
+            setLeftStick((float)Leftjoystick_X,(float)Leftjoystick_Y);
+        }
+
+    }
+   /* private Handler handler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            String buffer=(String) msg.obj;
+            textView.setText(buffer);
+        }
+    };*/
+    private  Runnable mAutoFlightprocess=new Runnable()
+    {
+        @Override
+        public void run() {
+
+            while(Flight_starting|Yaw_starting|Climb_starting){
+                AutoFlight=true;
+                ClimbNYaw_insturction();
+                Flight_instruction();
+                String buffer="FlightRemain:"+Float.toString((float)FlightUnit_val)+" YawRemain:"+Float.toString((float)YawUnit_val)+" ClimbRemain:"+ Float.toString((float)ClimbUnit_val);
+                ToastUtils.setResultToText(textView,buffer);
+                status_solid.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        status_solid.setBackgroundColor(0xB2FFFF00);
+                    }
+                });
+
+            }
+            AutoFlight=false;
+            status_solid.post(new Runnable() {
+                @Override
+                public void run() {
+                    status_solid.setBackgroundColor(0xB2FF0000);
+                }
+            });
+        }
+    };
+
+    private void initFlightController(){
+        flightController.setStateCallback(
+                new FlightControllerState.Callback(){
+                    @Override
+                    public void onUpdate(FlightControllerState  FlightControllerState_in) {
+                        mFlightControllerState=FlightControllerState_in;
+                        VelocityX=mFlightControllerState.getVelocityX();
+                        VelocityY=mFlightControllerState.getVelocityY();
+                        VelocityZ=mFlightControllerState.getVelocityZ();
+                        String buffer="Vx:"+Float.toString(VelocityX)+" Vy:"+Float.toString(VelocityY)+" Vz:"+Float.toString(VelocityZ);
+                        ToastUtils.setResultToText(flight_data,buffer);
+
+                    }
+                }
+        );
+
+    }
+
+    private void AutoInsturction_flight(){
+        if(!AutoFlight){
+            //colortmp=status_solid.get
+            textView.setText("Start");
+            FlightProcessThread=new Thread(mAutoFlightprocess);
+            FlightProcessThread.start();
+        }
+    }
+
     @Override
     public void onClick(View v) {
-        FlightController flightController = ModuleVerificationUtil.getFlightController();
+        flightController = ModuleVerificationUtil.getFlightController();
         if (flightController == null) {
             return;
+        }
+        else{
+            initFlightController();
         }
         switch (v.getId()) {
             case R.id.btn_take_off:
@@ -429,12 +499,15 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
             case R.id.btn_start_Flight:
                 textView.setText("start");
                 set_Flight_perm();
+                AutoInsturction_flight();
                 break;
             case R.id.btn_start_Yaw:
                 set_Yaw_perm();
+                AutoInsturction_flight();
                 break;
             case R.id.btn_start_Climb:
                 set_Climb_perm();
+                AutoInsturction_flight();
                 break;
             case R.id.btn_stop_inst:
                 stop_inst();
@@ -449,6 +522,18 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
         if (compoundButton == btnSimulator) {
             onClickSimulator(b);
+        }
+        if (compoundButton == btn_man_flight) {
+            if(b) {
+                ManFlight=true;
+                stop_inst();
+                //status_solid.setBackgroundColor(0x00FF00);
+                status_solid.setBackgroundColor(0xB200FF00);
+            }
+            else{
+                ManFlight=false;
+                status_solid.setBackgroundColor(0xB2FF0000);
+            }
         }
     }
 
