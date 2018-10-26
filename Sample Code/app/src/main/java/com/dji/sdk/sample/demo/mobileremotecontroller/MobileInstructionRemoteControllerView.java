@@ -2,8 +2,6 @@ package com.dji.sdk.sample.demo.mobileremotecontroller;
 
 import android.app.Service;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.shapes.Shape;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,12 +10,8 @@ import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.ToggleButton;
-import android.widget.Spinner;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.graphics.drawable.Drawable;
-import android.os.Handler;
-import android.os.Message;
+
 import com.dji.sdk.sample.R;
 import com.dji.sdk.sample.internal.OnScreenJoystickListener;
 import com.dji.sdk.sample.internal.controller.DJISampleApplication;
@@ -65,6 +59,7 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
     private EditText YawUnit_val_text;
     private EditText ClimbThrust_val_text;
     private EditText ClimbUnit_val_text;
+    private EditText distance_offset_text;
 
     private Button btn_start_Flight;
     private Button btn_start_Yaw;
@@ -73,34 +68,39 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
     private ToggleButton btn_man_flight;
     //------------------------------Flight Permanent----------------------------------------------//
     private boolean Flight_starting;
+    private ToggleButton FlightUnit_select;
     private double Bearing_val;
     private double FlightThrust_val;
     private double FlightUnit_val;
     private double Rightjoystick_X;
     private double Rightjoystick_Y;
     private long Flight_timestamp;
-    private long FlightUnit_remain;
+    private boolean FlightTime_sel;
     //------------------------------Yaw Permanent----------------------------------------------//
+    private ToggleButton YawUnit_select;
     private boolean Yaw_starting;
     private double YawThrust_val;
     private double YawUnit_val;
     private double Leftjoystick_X;
     private long Yaw_timestamp;
-    private long YawUnit_remain;
+    private boolean YawTime_sel;
+    private float headingTmp;
     //------------------------------Climb Permanent----------------------------------------------//
+    private ToggleButton ClimbUnit_select;
     private boolean Climb_starting;
     private double ClimbThrust_val;
     private double ClimbUnit_val;
     private double Leftjoystick_Y;
     private long Climb_timestamp;
-    private long ClimbUnit_remain;
+    private boolean ClimbTime_sel;
     //------------------------------flight data--------------------------------------------------
     private float VelocityX;
     private float VelocityY;
     private float VelocityZ;
+    private float CompassHeading;
+    private float distance_offset;
     //-----------------------------Thread------------------------------------------------------..
     private  Thread FlightProcessThread;
-    private int colortmp;
     private boolean AutoFlight;
     private boolean ManFlight ;
     //private static double thrust_limit=0.5;
@@ -152,20 +152,19 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
     }
 
     private void initUI() {
-       status_solid =(Button) findViewById(R.id.status_solid);
-       status_solid.setBackgroundColor(0xB2FF0000);
+        status_solid =(Button) findViewById(R.id.status_solid);
+        status_solid.setBackgroundColor(0xB2FF0000);
+
+        textView = (TextView) findViewById(R.id.textview_simulator);
+        flight_data = (TextView) findViewById(R.id.flight_data);
+
         btnTakeOff = (Button) findViewById(R.id.btn_take_off);
+        btnTakeOff.setOnClickListener(this);
+
         autoLand = (Button) findViewById(R.id.btn_auto_land);
         autoLand.setOnClickListener(this);
         forceLand = (Button) findViewById(R.id.btn_force_land);
         forceLand.setOnClickListener(this);
-        btnSimulator = (ToggleButton) findViewById(R.id.btn_start_simulator);
-        btnSimulator.setOnCheckedChangeListener(MobileInstructionRemoteControllerView.this);
-        textView = (TextView) findViewById(R.id.textview_simulator);
-        flight_data = (TextView) findViewById(R.id.flight_data);
-
-        btn_man_flight = (ToggleButton) findViewById(R.id.btn_man_flight);
-        btn_man_flight.setOnCheckedChangeListener(MobileInstructionRemoteControllerView.this);
 
         btn_start_Flight = (Button) findViewById(R.id.btn_start_Flight);
         btn_start_Flight.setOnClickListener(this);
@@ -186,20 +185,31 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
         ClimbThrust_val_text=(EditText)  findViewById(R.id.ClimbThrust_val);
         ClimbUnit_val_text=(EditText)  findViewById(R.id.ClimbUnit_val);
 
+        distance_offset_text=(EditText)  findViewById(R.id.distance_offset);
         Flight_starting=false;
         Yaw_starting=false;
         Climb_starting=false;
-        //ArrayAdapter<String> UnitAdapter = new ArrayAdapter<String>(MainActivity.this,android.R.layout.simple_spinner_dropdown_item,UnitItems);
 
-
-        //FlightUnit_spinner.setAdapter(UnitAdapter);
-        //YawUnit_spinner.setAdapter(UnitAdapter);
-        //ClimbUnit_spinner.setAdapter(UnitAdapter);
+        FlightTime_sel=false;
+        YawTime_sel=false;
+        ClimbTime_sel=false;
 
         screenJoystickRight = (OnScreenJoystick) findViewById(R.id.directionJoystickRight);
         screenJoystickLeft = (OnScreenJoystick) findViewById(R.id.directionJoystickLeft);
+        //screenJoystickRight.setVisibility(View.INVISIBLE);
+        //screenJoystickLeft.setVisibility(View.INVISIBLE);
 
-        btnTakeOff.setOnClickListener(this);
+        btnSimulator = (ToggleButton) findViewById(R.id.btn_start_simulator);
+        btnSimulator.setOnCheckedChangeListener(MobileInstructionRemoteControllerView.this);
+        btn_man_flight = (ToggleButton) findViewById(R.id.btn_man_flight);
+        btn_man_flight.setOnCheckedChangeListener(MobileInstructionRemoteControllerView.this);
+        FlightUnit_select=(ToggleButton) findViewById(R.id.FlightUnit_select);
+        FlightUnit_select.setOnCheckedChangeListener(MobileInstructionRemoteControllerView.this);
+        YawUnit_select=(ToggleButton) findViewById(R.id.YawUnit_select);
+        YawUnit_select.setOnCheckedChangeListener(MobileInstructionRemoteControllerView.this);
+        ClimbUnit_select=(ToggleButton) findViewById(R.id.ClimbUnit_select);
+        ClimbUnit_select.setOnCheckedChangeListener(MobileInstructionRemoteControllerView.this);
+
         ManFlight =false;
         AutoFlight=false;
         Boolean isSimulatorOn = (Boolean) KeyManager.getInstance().getValue(isSimulatorActived);
@@ -276,17 +286,17 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
         //screenJoystickRight.setJoystickListener(null);
     }
     private void set_Flight_perm(){
-
-        Bearing_val = Float.parseFloat(Bearing_val_text.getText().toString());
+        Bearing_val = -(Float.parseFloat(Bearing_val_text.getText().toString()))+90.0;
         FlightThrust_val = Float.parseFloat(FlightThrust_val_text.getText().toString())/100.0;
         if(FlightThrust_val>1.0) FlightThrust_val=1.0;
         if(FlightThrust_val<-1.0) FlightThrust_val=-1.0;
         Rightjoystick_X= FlightThrust_val*Math.cos(Math.toRadians(Bearing_val));
         Rightjoystick_Y = FlightThrust_val*Math.sin(Math.toRadians(Bearing_val));
-        FlightUnit_val = Float.parseFloat(FlightUnit_val_text.getText().toString());
+        FlightUnit_val = Float.parseFloat(FlightUnit_val_text.getText().toString())-distance_offset;
         Flight_timestamp=System.currentTimeMillis();
         //FlightUnit_val_text.setFocusable(false);
         Flight_starting=true;
+
     }
     private void set_Yaw_perm(){
         YawThrust_val =  Float.parseFloat(YawThrust_val_text.getText().toString())/100.0;
@@ -294,21 +304,23 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
         if(YawThrust_val<-1.0) YawThrust_val=-1.0;
         YawUnit_val =  Float.parseFloat(YawUnit_val_text.getText().toString());
         Leftjoystick_X = YawThrust_val;
-
         Yaw_timestamp=System.currentTimeMillis();
+        headingTmp=CompassHeading;
         //YawUnit_val_text.setFocusable(false);
         Yaw_starting=true;
     }
     private void set_Climb_perm(){
+
         ClimbThrust_val =  Float.parseFloat(ClimbThrust_val_text.getText().toString())/100.0;
         if(ClimbThrust_val>1.0) ClimbThrust_val=1.0;
         if(ClimbThrust_val<-1.0) ClimbThrust_val=-1.0;
-        ClimbUnit_val =  Float.parseFloat(ClimbUnit_val_text.getText().toString());
+        ClimbUnit_val =  Float.parseFloat(ClimbUnit_val_text.getText().toString())-distance_offset;
         Leftjoystick_Y = ClimbThrust_val;
 
         Climb_timestamp=System.currentTimeMillis();
         //ClimbUnit_val_text.setFocusable(false);
         Climb_starting=true;
+
     }
     private void stop_inst(){
         ClimbUnit_val=0;
@@ -318,9 +330,6 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
         Leftjoystick_Y=0;
         Rightjoystick_X=0;
         Rightjoystick_Y=0;
-       // FlightUnit_val_text.setFocusable(true);
-        //YawUnit_val_text.setFocusable(true);
-        //ClimbUnit_val_text.setFocusable(true);
     }
     private void setLeftStick(float pX, float pY){
         if (Math.abs(pX) < 0.02) {
@@ -350,7 +359,18 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
     }
     private void Flight_instruction() {
         if(Flight_starting) {
-            FlightUnit_val -= (System.currentTimeMillis() - Flight_timestamp);
+            if(FlightTime_sel) {
+                FlightUnit_val -= (System.currentTimeMillis() - Flight_timestamp);
+            }
+            else {
+                double timediff=(double) (System.currentTimeMillis() - Flight_timestamp)/1000.0;
+                double VFlight= Math.sqrt(VelocityX*VelocityX)+(VelocityY*VelocityY);
+                FlightUnit_val-=(timediff*VFlight);
+                if((FlightUnit_val-(timediff*VFlight))<=0){
+                    Rightjoystick_X=0;
+                    Rightjoystick_Y=0;
+                }
+            }
             Flight_timestamp = System.currentTimeMillis();
             if (FlightUnit_val<=0.0f) {
                 Rightjoystick_X = 0.0;
@@ -360,34 +380,51 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
                 FlightUnit_val_text.setFocusable(true);
             }
 
-            //FlightUnit_val_text.setText(Float.toString((float)FlightUnit_val));
             setRightStick((float) Rightjoystick_X, (float) Rightjoystick_Y);
         }
     }
     private void Yaw_instruction(){
         if(Yaw_starting){
-            YawUnit_val-=(System.currentTimeMillis()-Yaw_timestamp);
-            Yaw_timestamp = System.currentTimeMillis();
+            if(YawTime_sel) {
+                YawUnit_val -= (System.currentTimeMillis() - Yaw_timestamp);
+                Yaw_timestamp = System.currentTimeMillis();
+            }
+            else {
+                float diff=Math.abs(CompassHeading-headingTmp);
+                if(diff>180.0f)
+                    diff-=360.0f;
+                YawUnit_val-=diff;
+                headingTmp=CompassHeading;
+            }
             if(YawUnit_val<=0.0f){
                 YawUnit_val=0;
                 Leftjoystick_X=0.0;
                 Yaw_starting=false;
                 YawUnit_val_text.setFocusable(true);
             }
-            //YawUnit_val_text.setText(Float.toString((float)YawUnit_val));
+
         }
     }
     private void Climb_instruction(){
         if(Climb_starting) {
-            ClimbUnit_val -= (System.currentTimeMillis() - Climb_timestamp);
-            Climb_timestamp=System.currentTimeMillis();
+            if(ClimbTime_sel) {
+                ClimbUnit_val -= (System.currentTimeMillis() - Climb_timestamp);
+            }
+            else {
+                double timediff=(double) (System.currentTimeMillis() - Climb_timestamp)/1000.0;
+                ClimbUnit_val-=(timediff*VelocityZ);
+                if(ClimbUnit_val-(timediff*VelocityZ)<=0.0){
+                    Leftjoystick_Y-=0;
+                }
+            }
+            Climb_timestamp = System.currentTimeMillis();
             if ( ClimbUnit_val<= 0.0f) {
                 ClimbUnit_val=0;
                 Leftjoystick_Y = 0.0f;
                 Climb_starting = false;
                 ClimbUnit_val_text.setFocusable(true);
             }
-            //ClimbUnit_val_text.setText(Float.toString((float)ClimbUnit_val));
+
         }
     }
     private  void ClimbNYaw_insturction(){
@@ -398,13 +435,13 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
         }
 
     }
-   /* private Handler handler=new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            String buffer=(String) msg.obj;
-            textView.setText(buffer);
-        }
-    };*/
+    /* private Handler handler=new Handler(){
+         @Override
+         public void handleMessage(Message msg) {
+             String buffer=(String) msg.obj;
+             textView.setText(buffer);
+         }
+     };*/
     private  Runnable mAutoFlightprocess=new Runnable()
     {
         @Override
@@ -428,7 +465,10 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
             status_solid.post(new Runnable() {
                 @Override
                 public void run() {
-                    status_solid.setBackgroundColor(0xB2FF0000);
+                    if(ManFlight)
+                        status_solid.setBackgroundColor(0xB200FF00);
+                    else
+                        status_solid.setBackgroundColor(0xB2FF0000);
                 }
             });
         }
@@ -443,9 +483,9 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
                         VelocityX=mFlightControllerState.getVelocityX();
                         VelocityY=mFlightControllerState.getVelocityY();
                         VelocityZ=mFlightControllerState.getVelocityZ();
-                        String buffer="Vx:"+Float.toString(VelocityX)+" Vy:"+Float.toString(VelocityY)+" Vz:"+Float.toString(VelocityZ);
+                        CompassHeading=flightController.getCompass().getHeading();
+                        String buffer="Vx:"+Float.toString(VelocityX)+" Vy:"+Float.toString(VelocityY)+" Vz:"+Float.toString(VelocityZ)+" Heading:"+Float.toString(CompassHeading);
                         ToastUtils.setResultToText(flight_data,buffer);
-
                     }
                 }
         );
@@ -463,6 +503,7 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
 
     @Override
     public void onClick(View v) {
+        distance_offset=Float.parseFloat(distance_offset_text.getText().toString());
         flightController = ModuleVerificationUtil.getFlightController();
         if (flightController == null) {
             return;
@@ -523,17 +564,31 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
         if (compoundButton == btnSimulator) {
             onClickSimulator(b);
         }
-        if (compoundButton == btn_man_flight) {
+        else if (compoundButton == btn_man_flight) {
             if(b) {
                 ManFlight=true;
                 stop_inst();
-                //status_solid.setBackgroundColor(0x00FF00);
                 status_solid.setBackgroundColor(0xB200FF00);
+                //screenJoystickRight.setVisibility(View.VISIBLE);
+                //screenJoystickLeft.setVisibility(View.VISIBLE);
             }
             else{
                 ManFlight=false;
                 status_solid.setBackgroundColor(0xB2FF0000);
+                //screenJoystickRight.setVisibility(View.INVISIBLE);
+                //screenJoystickLeft.setVisibility(View.INVISIBLE);
             }
+        }
+        else if(compoundButton==FlightUnit_select){
+            FlightTime_sel=b;
+
+        }
+        else if(compoundButton==YawUnit_select){
+            YawTime_sel=b;
+
+        }
+        else if(compoundButton==ClimbUnit_select){
+            ClimbTime_sel=b;
         }
     }
 
