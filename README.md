@@ -17,4 +17,4 @@ A new page was created with instruction control
 7:Enable/Disable joystick control  
 8:Terminate the set instruction
 ## Demo
-![ALT TEXT](https://drive.google.com/file/d/1T7JGBO-hmbGV-9ak98ddnFakT7dj_ou8/view?usp=sharing)
+https://drive.google.com/file/d/1T7JGBO-hmbGV-9ak98ddnFakT7dj_ou8/view?usp=sharing
