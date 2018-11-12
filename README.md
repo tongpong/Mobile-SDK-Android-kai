@@ -1,9 +1,9 @@
 # DJI Mobile SDK for Android With Instruction control
 
 A new page was created with instruction control
-##Java source 	
+## Java source 	
 	"Sample Code/app/src/main/java/com/dji/sdk/sample/demo/mobileremotecontroller/MobileInstructionRemoteControllerView.java"
-##XML source	
+## XML source	
 	"Sample Code/app/src/main/res/layout/view_mobile_structionrc.xml"
 ##Details
 [!image]("READimage/layout1.png")
