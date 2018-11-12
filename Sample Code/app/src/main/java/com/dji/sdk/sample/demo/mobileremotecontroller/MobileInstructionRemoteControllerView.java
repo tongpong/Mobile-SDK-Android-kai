@@ -21,8 +21,7 @@ import com.dji.sdk.sample.internal.utils.OnScreenJoystick;
 import com.dji.sdk.sample.internal.utils.ToastUtils;
 import com.dji.sdk.sample.internal.view.PresentableView;
 
-//import java.util.logging.Handler;
-import java.util.logging.LogRecord;
+
 
 import dji.common.error.DJIError;
 import dji.common.flightcontroller.FlightControllerState;
@@ -196,8 +195,7 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
 
         screenJoystickRight = (OnScreenJoystick) findViewById(R.id.directionJoystickRight);
         screenJoystickLeft = (OnScreenJoystick) findViewById(R.id.directionJoystickLeft);
-        //screenJoystickRight.setVisibility(View.INVISIBLE);
-        //screenJoystickLeft.setVisibility(View.INVISIBLE);
+
 
         btnSimulator = (ToggleButton) findViewById(R.id.btn_start_simulator);
         btnSimulator.setOnCheckedChangeListener(MobileInstructionRemoteControllerView.this);
@@ -454,13 +452,7 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
         setLeftStick((float)Leftjoystick_X,(float)Leftjoystick_Y);
 
     }
-    /* private Handler handler=new Handler(){
-         @Override
-         public void handleMessage(Message msg) {
-             String buffer=(String) msg.obj;
-             textView.setText(buffer);
-         }
-     };*/
+
     private  Runnable mAutoFlightprocess=new Runnable()
     {
         @Override
@@ -589,14 +581,12 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
                 ManFlight=true;
                 stop_inst();
                 status_solid.setBackgroundColor(0xB200FF00);
-                //screenJoystickRight.setVisibility(View.VISIBLE);
-                //screenJoystickLeft.setVisibility(View.VISIBLE);
+
             }
             else{
                 ManFlight=false;
                 status_solid.setBackgroundColor(0xB2FF0000);
-                //screenJoystickRight.setVisibility(View.INVISIBLE);
-                //screenJoystickLeft.setVisibility(View.INVISIBLE);
+
             }
         }
         else if(compoundButton==FlightUnit_select){
@@ -619,7 +609,6 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
         }
         if (isChecked) {
 
-            //textView.setVisibility(VISIBLE);
             simulator.start(InitializationData.createInstance(new LocationCoordinate2D(23, 113), 10, 10),
                     new CompletionCallback() {
                         @Override
@@ -629,7 +618,6 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
                     });
         } else {
 
-            //textView.setVisibility(INVISIBLE);
             simulator.stop(new CompletionCallback() {
                 @Override
                 public void onResult(DJIError djiError) {
