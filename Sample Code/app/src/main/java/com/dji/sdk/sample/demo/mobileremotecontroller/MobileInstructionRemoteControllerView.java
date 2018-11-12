@@ -314,7 +314,7 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
         ClimbThrust_val =  Float.parseFloat(ClimbThrust_val_text.getText().toString())/100.0;
         if(ClimbThrust_val>1.0) ClimbThrust_val=1.0;
         if(ClimbThrust_val<-1.0) ClimbThrust_val=-1.0;
-        ClimbUnit_val =  Float.parseFloat(ClimbUnit_val_text.getText().toString())-distance_offset;
+        ClimbUnit_val =  Float.parseFloat(ClimbUnit_val_text.getText().toString());
         Leftjoystick_Y = ClimbThrust_val;
 
         Climb_timestamp=System.currentTimeMillis();
@@ -357,6 +357,19 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
             mobileRemoteController.setRightStickVertical(pY);
         }
     }
+    private double bearing_process(double x, double y){
+        double angle=Math.toDegrees(Math.atan(Math.abs(y/x)));
+        if(x<0&&y>0){
+            angle=180-angle;
+        }
+        if(x<0&&y<0){
+            angle+=180;
+        }
+        if(x>0&&y>0){
+            angle=360-angle;
+        }
+        return angle;
+    }
     private void Flight_instruction() {
         if(Flight_starting) {
             if(FlightTime_sel) {
@@ -366,11 +379,10 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
                 double timediff=(double) (System.currentTimeMillis() - Flight_timestamp)/1000.0;
                 double VFlight= Math.sqrt(VelocityX*VelocityX)+(VelocityY*VelocityY);
                 FlightUnit_val-=(timediff*VFlight);
-                if((FlightUnit_val-(timediff*VFlight))<=0){
-                    Rightjoystick_X=0;
-                    Rightjoystick_Y=0;
-                }
+
+
             }
+
             Flight_timestamp = System.currentTimeMillis();
             if (FlightUnit_val<=0.0f) {
                 Rightjoystick_X = 0.0;
@@ -379,9 +391,17 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
                 FlightUnit_val=0;
                 FlightUnit_val_text.setFocusable(true);
             }
+            else {
+                if (VelocityY != 0) {
+                    double angleNow = -bearing_process(VelocityY, VelocityX)+90;
+                  //  double angleDiff = Bearing_val - angleNow;
+                    //Rightjoystick_X = FlightThrust_val * Math.cos(Math.toRadians(Bearing_val + angleDiff));
+                    //Rightjoystick_Y = FlightThrust_val * Math.sin(Math.toRadians(Bearing_val + angleDiff));
 
-            setRightStick((float) Rightjoystick_X, (float) Rightjoystick_Y);
+                }
+            }
         }
+        setRightStick((float) Rightjoystick_X, (float) Rightjoystick_Y);
     }
     private void Yaw_instruction(){
         if(Yaw_starting){
@@ -413,9 +433,7 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
             else {
                 double timediff=(double) (System.currentTimeMillis() - Climb_timestamp)/1000.0;
                 ClimbUnit_val-=(timediff*VelocityZ);
-                if(ClimbUnit_val-(timediff*VelocityZ)<=0.0){
-                    Leftjoystick_Y-=0;
-                }
+
             }
             Climb_timestamp = System.currentTimeMillis();
             if ( ClimbUnit_val<= 0.0f) {
@@ -431,8 +449,9 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
         if(Yaw_starting||Climb_starting){
             Yaw_instruction();
             Climb_instruction();
-            setLeftStick((float)Leftjoystick_X,(float)Leftjoystick_Y);
+
         }
+        setLeftStick((float)Leftjoystick_X,(float)Leftjoystick_Y);
 
     }
     /* private Handler handler=new Handler(){
@@ -484,7 +503,8 @@ public class MobileInstructionRemoteControllerView extends RelativeLayout
                         VelocityY=mFlightControllerState.getVelocityY();
                         VelocityZ=mFlightControllerState.getVelocityZ();
                         CompassHeading=flightController.getCompass().getHeading();
-                        String buffer="Vx:"+Float.toString(VelocityX)+" Vy:"+Float.toString(VelocityY)+" Vz:"+Float.toString(VelocityZ)+" Heading:"+Float.toString(CompassHeading);
+                        double angleNow = bearing_process(VelocityX, VelocityY)+90;
+                        String buffer="Vx:"+Float.toString(VelocityX)+" Vy:"+Float.toString(VelocityY)+" Vz:"+Float.toString(VelocityZ)+" Heading:"+Float.toString(CompassHeading)+" Flying:"+ Float.toString((float)angleNow);
                         ToastUtils.setResultToText(flight_data,buffer);
                     }
                 }
