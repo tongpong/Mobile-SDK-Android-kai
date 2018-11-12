@@ -5,9 +5,9 @@ A new page was created with instruction control
 	"Sample Code/app/src/main/java/com/dji/sdk/sample/demo/mobileremotecontroller/MobileInstructionRemoteControllerView.java"
 ## XML source	
 	"Sample Code/app/src/main/res/layout/view_mobile_structionrc.xml"
-##Details
+## Details
 [!image]("READimage/layout1.png")
-[!image]("READimage/layout2.png")
+[!image]("READimage/layout2.png")  
 1:Setting the flight direction without rotate the body.  
 2:Setting the speed of the movement. Default is recommented.  
 3:Click for switching between distance/angle and time domain.  
