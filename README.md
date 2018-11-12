@@ -17,4 +17,7 @@ A new page was created with instruction control
 7:Enable/Disable joystick control  
 8:Terminate the set instruction
 ## Demo
+### distance test
+https://drive.google.com/file/d/1jyGCSQe7bLcWoYi0YVeilkQr7o3i00XP/view?usp=sharing
+### square flight
 https://drive.google.com/file/d/1T7JGBO-hmbGV-9ak98ddnFakT7dj_ou8/view?usp=sharing
