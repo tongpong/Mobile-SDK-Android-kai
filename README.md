@@ -14,5 +14,5 @@ A new page was created with instruction control
 4:Setting the value of movement's unit.  
 5:Click for starting the instruction.  
 6:It seems to be a constant error when Flight with a distance is set, which is about 0.7m more than the set value.  
-7:Enable/Disable joystick control 
+7:Enable/Disable joystick control  
 8:Terminate the set instruction
