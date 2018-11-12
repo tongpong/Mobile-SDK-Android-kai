@@ -6,8 +6,8 @@ A new page was created with instruction control
 ## XML source	
 	"Sample Code/app/src/main/res/layout/view_mobile_structionrc.xml"
 ## Details
-[!image](https://raw.githubusercontent.com/tongpong/Mobile-SDK-Android-KAI/master/READMEimage/layout1.png)
-[!image](https://raw.githubusercontent.com/tongpong/Mobile-SDK-Android-KAI/master/READMEimage/layout2.png)  
+![image](https://raw.githubusercontent.com/tongpong/Mobile-SDK-Android-KAI/master/READMEimage/layout1.png)
+![image](https://raw.githubusercontent.com/tongpong/Mobile-SDK-Android-KAI/master/READMEimage/layout2.png)  
 1:Setting the flight direction without rotate the body.  
 2:Setting the speed of the movement. Default is recommented.  
 3:Click for switching between distance/angle and time domain.  
