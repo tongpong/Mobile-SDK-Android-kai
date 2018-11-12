@@ -16,3 +16,5 @@ A new page was created with instruction control
 6:It seems to be a constant error when Flight with a distance is set, which is about 0.7m more than the set value.  
 7:Enable/Disable joystick control  
 8:Terminate the set instruction
+## Demo
+![ALT TEXT](https://drive.google.com/file/d/1T7JGBO-hmbGV-9ak98ddnFakT7dj_ou8/view?usp=sharing)
